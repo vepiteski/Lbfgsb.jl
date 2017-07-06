@@ -32,9 +32,9 @@ macro callLBFGS(cmd)
                Ptr{Float64},
                Ptr{Float64},
                Ptr{Int32},
-               Ptr{Uint8},
+               Ptr{UInt8},
                Ptr{Int32},
-               Ptr{Uint8},
+               Ptr{UInt8},
                Ptr{Bool},
                Ptr{Int32},
                Ptr{Float64} ),
@@ -60,19 +60,19 @@ macro callLBFGS(cmd)
 end
 
     
-function lbfgsb (ogFunc!::Function,
-                 x::Array;
-                 lb = [],
-                 ub = [],
-                 btype = [],
-                 m::Int64 = 5,
-                 maxiter::Int64 = 100,
-                 factr::Float64 = 1e7,
-                 pgtol::Float64 = 1e-5,
-                 iprint::Int64 = -1 # does not print
-                 )
+function lbfgsb(ogFunc!::Function,
+                x::Array;
+                lb = [],
+                ub = [],
+                btype = [],
+                m::Int64 = 5,
+                maxiter::Int64 = 100,
+                factr::Float64 = 1e7,
+                pgtol::Float64 = 1e-5,
+                iprint::Int64 = -1 # does not print
+                )
     initial_x = x;
-        
+    
     m = [convert(Int32, m)]
     factr = [convert(Float64, factr)];
     pgtol = [convert(Float64, pgtol)];
@@ -103,8 +103,8 @@ function lbfgsb (ogFunc!::Function,
     # structures used by the L-BFGS-B routine.
     wa = [convert(Float64, 0.0) for i = 1:(2*m[1] + 5)*n[1] + 12*m[1]*(m[1] + 1)];
     iwa = [convert(Int32, 0) for i = 1:3*n[1]];
-    task = [convert(Uint8, 0) for i =1:60];
-    csave = [convert(Uint8, 0) for i =1:60];
+    task = [convert(UInt8, 0) for i =1:60];
+    csave = [convert(UInt8, 0) for i =1:60];
     lsave = [convert(Bool, 0) for i=1:4];
     isave = [convert(Int32, 0) for i=1:44];
     dsave = [convert(Float64, 0.0) for i=1:29];
@@ -118,22 +118,22 @@ function lbfgsb (ogFunc!::Function,
 
     while true
 
-        if task[1] == 'F'
+        if task[1] == UInt32('F')
             f[1] = convert( Float64, ogFunc!(x,g) );
             c += 1;
             
-        elseif task[1] == 'N'
+        elseif task[1] == UInt32('N')
             t += 1;
             if t >= maxiter # exceed maximum number of iteration
                 @callLBFGS "STOP"
                 break;
             end
-        elseif task[1] == 'C' # convergence
+        elseif task[1] == UInt32('C') # convergence
             break;
-        elseif task[1] == 'A'
+        elseif task[1] == UInt32('A')
             status = "abnormal";
             break;
-        elseif task[1] == 'E'
+        elseif task[1] == UInt32('E')
             status = "error";
             break;
         end
@@ -146,7 +146,7 @@ function lbfgsb (ogFunc!::Function,
 end # function lbfgsb
 
 
-function lbfgsb (objFunc::Function,
+function lbfgsb(objFunc::Function,
                  gradFunc!::Function,
                  x::Array;
                  lb = [],
@@ -182,5 +182,9 @@ end # function lbfgsb
 
 
 export lbfgsb
+
+include("LbfgsbS.jl")
+include("L-BFGS-BS.jl")
+include("L-BFGS-B.jl")
 
 end # module
