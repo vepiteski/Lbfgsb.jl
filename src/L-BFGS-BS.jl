@@ -19,8 +19,8 @@ function LbfgsBS(nlp :: AbstractNLPModel;
     #end
 
     
-    tolI = atol + rtol * norm(g₀,Inf) 
-    verbose && println("LbfgsB: atol = ",atol," rtol = ",rtol," tolI = ",tolI, " norm(g₀) = ",norm(g₀))
+    tolI = max(stp.atol , stp.rtol * norm(g₀,Inf)) 
+    verbose && println("LbfgsB: atol = ",stp.atol," rtol = ",stp.rtol," tolI = ",tolI, " norm(g₀) = ",norm(g₀))
 
     verblevel = verbose ? 1 : -1
     
