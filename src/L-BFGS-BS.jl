@@ -2,6 +2,8 @@ export LbfgsBS
 
 
 function LbfgsBS(nlp :: AbstractNLPModel;
+                 lb=[],
+                 ub=[],
                  stp :: TStopping = TStopping(),
                  verbose :: Bool=false,
                  m :: Int=5,
@@ -27,6 +29,8 @@ function LbfgsBS(nlp :: AbstractNLPModel;
     f, x, iterB, callB, status, optimal, unbounded, tired, elapsed_time  =
         lbfgsbS(nlp,
                 x₀,
+                lb=lb,
+                ub=ub,
                 m=m,
                 stp=stp,
                 iprint = verblevel,
