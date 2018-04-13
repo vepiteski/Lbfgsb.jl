@@ -4,7 +4,7 @@
 ##   - https://github.com/JuliaOpt/NLopt.jl/blob/master/src/NLopt.jl
 ##
 
-if Base.OS_NAME != :Linux
+if  !is_linux()
     error("currently, this library only supports Linux")
 end
 
