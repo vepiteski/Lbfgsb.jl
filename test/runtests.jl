@@ -39,5 +39,6 @@ f, x, numCall, numIter, status  = lbfgsb( objFunc, gradFunc!, x, iprint=-1 )
 @test abs(x[1]-1) < 0.00001
 @test abs(x[2]-1) < 0.00001
 
-# write your own tests here
+# Interface to NLPmodels
+
 @test 1 == 1

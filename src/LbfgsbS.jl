@@ -12,7 +12,7 @@ function lbfgsbS(nlp :: AbstractNLPModel,
                  m::Int64 = 5,
                  stp :: TStopping = TStopping(),
                  #maxiter::Int64 = 100,
-                 factr::Float64 = 1e7,
+                 factr::Float64 = 1e1,
                  #pgtol::Float64 = 1e-5,
                  iprint::Int64 = -1 # does not print
                  )
@@ -30,7 +30,7 @@ function lbfgsbS(nlp :: AbstractNLPModel,
     m = [convert(Int32, m)]
     factr = [convert(Float64, factr)];
     #pgtol = [convert(Float64, pgtol)];
-    pgtol = [convert(Float64,stp.atol + stp.rtol * stp.optimality0)];
+    pgtol = [convert(Float64,max(stp.atol, stp.rtol * stp.optimality0))];
     iprint = [convert(Int32, iprint)];
     
     n = [convert(Int32, length(x))]; # number of variables
@@ -84,9 +84,11 @@ function lbfgsbS(nlp :: AbstractNLPModel,
             #if t >= maxiter # exceed maximum number of iteration
             if tired
                 @callLBFGS "STOP"
+                status = "Max iterations"
                 break;
             end
         elseif task[1] == UInt32('C') # convergence
+            status = "convergence"
             break;
         elseif task[1] == UInt32('A')
             status = "abnormal";

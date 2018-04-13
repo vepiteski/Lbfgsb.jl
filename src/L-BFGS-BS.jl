@@ -11,10 +11,10 @@ function LbfgsBS(nlp :: AbstractNLPModel;
     n = nlp.meta.nvar
     x₀ = copy(nlp.meta.x0)
     
-    g = Array(Float64,n)
-    g₀ = Array(Float64,n)
-    g = grad(nlp,x₀)
-    grad!(nlp,x₀,g₀)
+    g = Array{Float64}(n)
+    g₀ = Array{Float64}(n)
+    g = grad!(nlp, x₀, g)
+    grad!(nlp, x₀, g₀)
 
     #function _ogFunc!(x, g::Array{Float64})
     #    return objgrad!(nlp,x,g);

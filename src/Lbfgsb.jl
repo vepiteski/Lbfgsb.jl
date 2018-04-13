@@ -11,10 +11,10 @@ macro callLBFGS(cmd)
     quote
         if length($cmd) != 0
             @simd for i = 1:length($cmd)
-                task[i] = ($cmd)[i];
+                $(esc(:task))[i] = ($cmd)[i];
             end
             @simd for i = length($cmd)+1:60
-                task[i] = ' ';
+                $(esc(:task))[i] = ' ';
             end
         end
 
@@ -38,24 +38,24 @@ macro callLBFGS(cmd)
                Ptr{Bool},
                Ptr{Int32},
                Ptr{Float64} ),
-              n,
-              m,
-              x,
-              lb,
-              ub,
-              btype,
-              f,
-              g,
-              factr,
-              pgtol,
-              wa,
-              iwa,
-              task,
-              iprint,
-              csave,
-              lsave,
-              isave,
-              dsave );
+              $(esc(:n)),
+              $(esc(:m)),
+              $(esc(:x)),
+              $(esc(:lb)),
+              $(esc(:ub)),
+              $(esc(:btype)),
+              $(esc(:f)),
+              $(esc(:g)),
+              $(esc(:factr)),
+              $(esc(:pgtol)),
+              $(esc(:wa)),
+              $(esc(:iwa)),
+              $(esc(:task)),
+              $(esc(:iprint)),
+              $(esc(:csave)),
+              $(esc(:lsave)),
+              $(esc(:isave)),
+              $(esc(:dsave)) );
     end
 end
 
