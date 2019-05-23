@@ -4,7 +4,7 @@
 ##   - https://github.com/JuliaOpt/NLopt.jl/blob/master/src/NLopt.jl
 ##
 
-if  !is_linux()
+if  !Sys.islinux()
     error("currently, this library only supports Linux")
 end
 
@@ -38,7 +38,7 @@ end
 function writeDeps()
     libpath = joinpath(currentDirPath, "usr", "lib", "liblbfgsbf.so")
     outputfile = open(joinpath(currentDirPath, "deps.jl"), "w");
-    write( outputfile, "macro checked_lib(libname, path)\n    (Libdl.dlopen_e(path) == C_NULL) && error(\"Unable to load \\n\\n\$libname (\$path)\n\nPlease re-run Pkg.build(package), and restart Julia.\")\n    quote const \$(esc(libname)) = \$path end\nend\n@checked_lib liblbfgsbf \"$(libpath)\"\n")
+    write( outputfile, "using Libdl \n\n macro checked_lib(libname, path)\n    (Libdl.dlopen_e(path) == C_NULL) && error(\"Unable to load \\n\\n\$libname (\$path)\n\nPlease re-run Pkg.build(package), and restart Julia.\")\n    quote const \$(esc(libname)) = \$path end\nend\n@checked_lib liblbfgsbf \"$(libpath)\"\n")
     close(outputfile)
 end
 
