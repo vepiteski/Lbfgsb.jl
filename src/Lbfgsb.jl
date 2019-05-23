@@ -1,4 +1,5 @@
 module Lbfgsb
+using Libdl
 
 if isfile(joinpath(dirname(@__FILE__),"..","deps","deps.jl"))
     include("../deps/deps.jl")
@@ -7,6 +8,8 @@ else
 end
 
 # package code goes here
+
+
 macro callLBFGS(cmd)
     quote
         if length($cmd) != 0
@@ -19,7 +22,7 @@ macro callLBFGS(cmd)
         end
 
         ccall((:setulb_, liblbfgsbf),
-              Void,
+              Nothing,
               (Ptr{Int32},
                Ptr{Int32},
                Ptr{Float64},
@@ -183,8 +186,15 @@ end # function lbfgsb
 
 export lbfgsb
 
-include("LbfgsbS.jl")
-include("L-BFGS-BS.jl")
-include("L-BFGS-B.jl")
-
+using Pkg
+if haskey(Pkg.installed(),"NLPModels")
+    display(" NLPModels detected including L-BFGS-B.jl")
+    include("L-BFGS-B.jl")
+    if haskey(Pkg.installed(),"Stopping")
+        display(" Stopping detected ")
+        using LinearAlgebra
+        include("LbfgsbS.jl")
+        include("L-BFGS-BS.jl")
+    end
+end
 end # module

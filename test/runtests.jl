@@ -1,5 +1,5 @@
 using Lbfgsb
-using Base.Test
+using Test
 
 
 function ogFunc!(x, g::Vector)

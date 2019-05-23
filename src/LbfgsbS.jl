@@ -1,8 +1,12 @@
-
 export lbfgsbS
 
-using NLPModels
 using Stopping
+
+#  Low level interface, direct connexion with the FORTRAN code
+#
+#  If bounds are present, must be explicitely passed in lb and ub (not extracted from nlp)
+#
+#  Use preferably the higher level interface LbfgsBS
 
 function lbfgsbS(nlp :: AbstractNLPModel,
                  x::Array;
@@ -10,26 +14,22 @@ function lbfgsbS(nlp :: AbstractNLPModel,
                  ub = [],
                  btype = [],
                  m::Int64 = 5,
-                 stp :: TStopping = TStopping(),
-                 #maxiter::Int64 = 100,
+                 stp :: AbstractStopping = TStopping(),
                  factr::Float64 = 1e1,
-                 #pgtol::Float64 = 1e-5,
                  iprint::Int64 = -1 # does not print
                  )
 
-    function _ogFunc!(x, g::Array)
-        f, g = objgrad!(nlp, x, g)
-        return f
-    end
-    #ogFunc!(x,g) = objgrad!(nlp,x, g)
+    #function _ogFunc!(x, g::Array)
+    #    f, g = objgrad!(nlp, x, g)
+    #    return f
+    #end
 
-    start!(nlp,stp,x)
+    start!(stp,x)
     
     initial_x = x;
     
     m = [convert(Int32, m)]
     factr = [convert(Float64, factr)];
-    #pgtol = [convert(Float64, pgtol)];
     pgtol = [convert(Float64,max(stp.atol, stp.rtol * stp.optimality0))];
     iprint = [convert(Int32, iprint)];
     
@@ -80,11 +80,13 @@ function lbfgsbS(nlp :: AbstractNLPModel,
             
         elseif task[1] == UInt32('N')
             t += 1;
-            optimal, unbounded, tired, elapsed_time = stop(nlp,stp,t,x,f[1],g)
+            pg = gradproj(ub, lb, g, x)
+            stp_part = stop(stp,t,x,f[1],pg)
+            #optimal, unbounded, tired, elapsed_time = stop(stp,t,x,f[1],pg)
             #if t >= maxiter # exceed maximum number of iteration
-            if tired
+            if stp.tired
                 @callLBFGS "STOP"
-                status = "Max iterations"
+                status = "Max ressources"
                 break;
             end
         elseif task[1] == UInt32('C') # convergence
@@ -101,9 +103,13 @@ function lbfgsbS(nlp :: AbstractNLPModel,
         @callLBFGS ""
     end
 
-    optimal, unbounded, tired, elapsed_time = stop(nlp,stp,t,x,f[1],g)
 
-    return (f[1], x, t, c, status, optimal, unbounded, tired, elapsed_time)
+    # Check the stopping tolerances
+    pg = gradproj(ub, lb, g, x)
+    #optimal, unbounded, tired, elapsed_time = stop(stp,t,x,f[1],pg)
+    sf = stop(stp,t,x,f[1],pg)
+
+    return (x, f[1], g, t, c, status, stp.optimal, stp.unbounded, stp.tired, stp.elapsed_time)
     
 
 end # function lbfgsbS

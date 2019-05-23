@@ -1,0 +1,7 @@
+julia 0.7
+Libdl   #  to link
+Pkg     #  to test if optional Stopping and/or NLPModels are installed
+
+#NLPModels
+#Stopping
+#LinearAlgebra  # for norm

@@ -1,5 +1,7 @@
 export LbfgsB
 
+using NLPModels
+
 function LbfgsB(nlp :: AbstractNLPModel;
                 lb=[],
                 ub=[],
