@@ -62,7 +62,11 @@ macro callLBFGS(cmd)
     end
 end
 
-    
+
+# Very basic interface. Take care to copy the initial point prior calling lbfgsb
+# since it is modified by this direct interface to the FORTRAN code.
+
+
 function lbfgsb(ogFunc!::Function,
                 x::Array;
                 lb = [],
@@ -186,15 +190,27 @@ end # function lbfgsb
 
 export lbfgsb
 
-using Pkg
-if haskey(Pkg.installed(),"NLPModels")
-    display(" NLPModels detected including L-BFGS-B.jl")
-    include("L-BFGS-B.jl")
-    if haskey(Pkg.installed(),"Stopping")
-        display(" Stopping detected ")
-        using LinearAlgebra
-        include("LbfgsbS.jl")
-        include("L-BFGS-BS.jl")
-    end
-end
+#display(" test")
+
+
+#
+# Don't know how to select based on installed packages... The code commented below does
+# not work with the current Pkg 
+#
+
+#using Pkg
+#if haskey(Pkg.installed(),"NLPModels")
+#display(" NLPModels assumed: including L-BFGS-B.jl")
+#include("L-BFGS-B.jl")
+
+display(" NLPModels and Stopping are assumed: including L-bfgsb-S.jl")
+include("NLPlbfgsbS.jl")
+
+#    if haskey(Pkg.installed(),"Stopping")
+#        display(" Stopping assumed ")
+#        using LinearAlgebra
+#        include("LbfgsbS.jl")
+#        include("L-BFGS-BS.jl")
+#    end
+#end
 end # module
